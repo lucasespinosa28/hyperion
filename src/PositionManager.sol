@@ -59,7 +59,7 @@ contract PositionManager {
         require(collateralAmount > 0, "amount 0");
         require(leverage >= 1 && leverage <= 10, "invalid leverage");
 
-        IERC20(collateralToken).transferFrom(trader, address(this), collateralAmount);
+        // Router should have already transferred tokens to this contract
         IERC20(collateralToken).approve(address(vault), collateralAmount);
         vault.deposit(collateralToken, collateralAmount);
 

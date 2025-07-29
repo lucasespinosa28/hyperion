@@ -3,6 +3,7 @@ pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
 import "src/GLPToken.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "src/test/mocks/MockPositionManager.sol";
 import "src/PositionManager.sol";
 
@@ -34,7 +35,7 @@ contract GLPTokenTest is Test {
         glpToken.mint(recipient, amount);
 
         vm.prank(positionManager);
-        glpToken.burn(recipient, amount);
+        glpToken.burnFromAccount(recipient, amount);
 
         assertEq(glpToken.balanceOf(recipient), 0);
     }
@@ -43,7 +44,7 @@ contract GLPTokenTest is Test {
         address recipient = address(0x123);
         uint256 amount = 100;
 
-        vm.expectRevert("Ownable: caller is not the owner");
+        vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, address(this)));
         glpToken.mint(recipient, amount);
     }
 
@@ -54,7 +55,7 @@ contract GLPTokenTest is Test {
         vm.prank(positionManager);
         glpToken.mint(recipient, amount);
 
-        vm.expectRevert("Ownable: caller is not the owner");
-        glpToken.burn(recipient, amount);
+        vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, address(this)));
+        glpToken.burnFromAccount(recipient, amount);
     }
 }

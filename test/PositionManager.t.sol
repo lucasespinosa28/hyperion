@@ -19,15 +19,15 @@ contract PositionManagerTest is Test {
     address constant ETH_USD_PRICE_FEED = 0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419;
 
     function setUp() public {
+        // Deploy vault with a temporary address
         glpToken = new GLPToken("GLP Token", "GLP");
-        vault = new Vault(address(0)); // Will be set to PositionManager later
-        router = new Router(address(vault), address(0), address(glpToken)); // Will be set to PositionManager later
+        vault = new Vault(address(0xdead));
+        router = new Router(PositionManager(address(0xdead)));
         priceFeed = AggregatorV3Interface(ETH_USD_PRICE_FEED);
-        positionManager = new PositionManager(address(router), vault, glpToken, address(priceFeed));
-
-        // Set the position manager address in the vault and router
-        vault.transferOwnership(address(positionManager));
-        router.transferOwnership(address(positionManager));
+        positionManager = new PositionManager(address(router), vault, glpToken, ETH_USD_PRICE_FEED);
+        // Re-deploy vault and router with correct positionManager address
+        vault = new Vault(address(positionManager));
+        router = new Router(positionManager);
     }
 
     function test_CreatePosition() public {
